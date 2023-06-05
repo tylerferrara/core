@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"context"
@@ -26,7 +26,13 @@ type ContinuousSession struct {
 	sessions []Session
 }
 
-func ask(question string) Session {
+func GenContinuousSession(s []Session) ContinuousSession {
+	return ContinuousSession{
+		sessions: s,
+	}
+}
+
+func Ask(question string) Session {
 	return Session{
 		complete: false,
 		question: Question{text: question},
@@ -34,8 +40,10 @@ func ask(question string) Session {
 	}
 }
 
-func launch(sessions []Session) ([]Session, []openai.ChatCompletionMessage) {
+func Launch(c ContinuousSession) ([]Session, []openai.ChatCompletionMessage) {
 	// new chatgpt client
+	sessions := c.sessions
+
 	token := os.Getenv("API_KEY")
 	client := openai.NewClient(token)
 	messages := make([]openai.ChatCompletionMessage, 0)
@@ -72,5 +80,6 @@ func launch(sessions []Session) ([]Session, []openai.ChatCompletionMessage) {
 		})
 		fmt.Println("ANSWER:\n " + content)
 	}
+
 	return sessions, messages
 }
